@@ -1,6 +1,8 @@
 import superagent from 'superagent';
 import localforage from 'localforage';
 
+let instance = null;
+
 const testConnection = ({ networkTimeout, testConnectionURL }) => {
   const now = Date.now();
   return superagent.get(`${testConnectionURL}?t=${now}`).timeout({ response: networkTimeout });
@@ -9,7 +11,7 @@ const testConnection = ({ networkTimeout, testConnectionURL }) => {
 const createPromise = (requestType, data) => {
   return new Promise((resolve, reject) => {
     const request = data ? requestType.send(data) : requestType.send();
-    request.then((res) => {
+    return request.then((res) => {
       resolve(res);
     }).catch((err) => {
       reject(err);
@@ -19,36 +21,66 @@ const createPromise = (requestType, data) => {
 
 const noop = () => null;
 
+const DEFAULT_OPTS = {
+  networkTimeout: 4000,
+  testConnectionURL: 'https://api.coinranking.com/v1/public/coins',
+  unloadRequestsFailure: noop,
+  unloadRequestsSuccess: noop,
+  checkConnectionInterval: 10000,
+  batchCachedRequests: true
+};
+
+const setOpts = (opts, context) => {
+  const {
+    networkTimeout,
+    testConnectionURL,
+    checkConnectionInterval,
+    batchCachedRequests,
+    unloadRequestsFailure,
+    unloadRequestsSuccess
+  } = opts;
+  context.networkTimeout = networkTimeout || context.networkTimeout;
+  context.testConnectionURL = testConnectionURL || context.testConnectionURL;
+  context.batchCachedRequests = batchCachedRequests || context.batchCachedRequests;
+  context.unloadRequestsFailure = unloadRequestsFailure || context.unloadRequestsFailure;
+  context.unloadRequestsSuccess = unloadRequestsSuccess || context.unloadRequestsSuccess;
+  context.checkConnectionInterval = checkConnectionInterval || context.checkConnectionInterval;
+};
+
+const setPollingInterval = (context) => {
+  let pollingInterval = null;
+  return function() {
+    clearInterval(pollingInterval);
+    pollingInterval = setInterval(() => {
+      testConnection({ networkTimeout: context.networkTimeout, testConnectionURL: context.testConnectionURL }).then((res, err) => {
+        context.unloadRequests();
+      }).catch((err) => {
+        console.warn('Connection is not great!');
+      });
+    }, context.checkConnectionInterval || 1000);
+  }
+};
+
 class Postcache {
   constructor(opts) {
-    const {
-      networkTimeout,
-      testConnectionURL,
-      checkConnectionInterval,
-      batchCachedRequests,
-      unloadRequestsFailure,
-      unloadRequestsSuccess
-    } = opts;
-    this.networkTimeout = networkTimeout || 4000;
-    this.testConnectionURL = testConnectionURL || 'https://api.coinranking.com/v1/public/coins';
-    this.batchCachedRequests = batchCachedRequests || true;
-    this.unloadRequestsFailure = unloadRequestsFailure || noop;
-    this.unloadRequestsSuccess = unloadRequestsSuccess || noop;
-    this.checkConnectionInterval = checkConnectionInterval || 10000;
+    this.initialized = false;
+    setOpts(opts, this);
     localforage.config({
       name: 'postcache',
       storeName: 'requests'
     });
-    this.setPollingInterval();
   }
-  setPollingInterval() {
-    this.pollingInterval = setInterval(() => {
-      testConnection({ networkTimeout: this.networkTimeout, testConnectionURL: this.testConnectionURL }).then((res, err) => {
-        this.unloadRequests();
-      }).catch((err) => {
-        console.warn('Connection is not great!');
-      });
-    }, this.checkConnectionInterval || 10000);
+  init(opts = {}) {
+    if (!this.initialized) {
+      setOpts(opts, this)
+      this.setPollingInterval = setPollingInterval(this);
+      this.setPollingInterval();
+      this.initialized = true;
+      Object.freeze(this);
+      return this;
+    } else {
+      throw new Error('You have already initialized Postcache');
+    }
   }
   makeRequest(request) {
     const { type, data, headers, url } = request;
@@ -73,37 +105,42 @@ class Postcache {
       throw new Error('Please supply a url for your post request');
     }
     const { networkTimeout, testConnectionURL } = this;
-    testConnection({ networkTimeout, testConnectionURL }).then((res) => {
-      makeRequest(requestObjClone).then((response) => {
+    return testConnection({ networkTimeout, testConnectionURL }).then((res) => {
+      return this.makeRequest(requestObjClone).then((response) => {
         return response;
       })
     }).catch(() => {
-      this.cacheRequest(requestObjClone);
+      return this.cacheRequest(requestObjClone);
     });
   }
   post(requestObj) {
-    this.makeoOrCacheRequest(requestObj, 'post');
+    return this.makeoOrCacheRequest(requestObj, 'post');
   }
   put(requestObj) {
-    this.makeoOrCacheRequest(requestObj, 'put');
+    return this.makeoOrCacheRequest(requestObj, 'put');
   }
   delete(requestObj) {
-    this.makeoOrCacheRequest(requestObj, 'del');
+    return this.makeoOrCacheRequest(requestObj, 'del');
   }
   cacheRequest(requestObj) {
-    localforage.getItem('requests').then((requests) => {
+    return localforage.getItem('requests').then((requests) => {
       if (!requests) {
-        localforage.setItem('requests', [requestObj]);
+        return localforage.setItem('requests', [requestObj]).then(() => {
+          return { message: 'requests were cached', requests: [requestObj], requestCached: true };
+        });
       } else {
         requests.push(requestObj);
-        localforage.setItem('requests', requests);
+        return localforage.setItem('requests', requests).then(() => {
+          return { message: 'requests were cached', requests, requestCached: true };
+        });
       }
     });
   }
   unloadRequests() {
     const { batchCachedRequests, unloadRequestsSuccess, unloadRequestsFailure } = this;
-    clearInterval(this.pollingInterval);
     localforage.getItem('requests').then((requests) => {
+      console.log('requests ', requests);
+      this.setPollingInterval();
       if (requests) {
         if (batchCachedRequests) {
           const requestPromises = requests.map((request) => this.makeRequest(request));
@@ -113,7 +150,6 @@ class Postcache {
             });
             unloadRequestsSuccess(values);
           }).catch((err) => {
-            console.log('all promises err ', err);
             this.setPollingInterval();
             unloadRequestsFailure(err);
           });
@@ -123,4 +159,6 @@ class Postcache {
   }
 };
 
-export default Postcache;
+const postcacheSingleton = new Postcache(DEFAULT_OPTS);
+
+export default postcacheSingleton;
