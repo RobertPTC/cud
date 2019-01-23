@@ -139,7 +139,6 @@ class Postcache {
   unloadRequests() {
     const { batchCachedRequests, unloadRequestsSuccess, unloadRequestsFailure } = this;
     localforage.getItem('requests').then((requests) => {
-      this.setPollingInterval();
       if (requests) {
         if (batchCachedRequests) {
           const requestPromises = requests.map((request) => this.makeRequest(request));
@@ -153,6 +152,8 @@ class Postcache {
             unloadRequestsFailure(err);
           });
         }
+      } else {
+        this.setPollingInterval();
       }
     });
   }
