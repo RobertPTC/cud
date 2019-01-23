@@ -139,7 +139,6 @@ class Postcache {
   unloadRequests() {
     const { batchCachedRequests, unloadRequestsSuccess, unloadRequestsFailure } = this;
     localforage.getItem('requests').then((requests) => {
-      console.log('requests ', requests);
       this.setPollingInterval();
       if (requests) {
         if (batchCachedRequests) {
