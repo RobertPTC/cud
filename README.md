@@ -1,10 +1,14 @@
-# postcache
+# CUD
 
 [![Travis][build-badge]][build]
 [![npm package][npm-badge]][npm]
 [![Coveralls][coveralls-badge]][coveralls]
 
-### Remember to call init.
+CUD is a quick and simple JavaScript library for caching POST, PATCH, and DELETE requests made when your app is offline. CUD makes it easier to provide a comprehensive PWA experience for your users. CUD relies on [localforage](https://github.com/localForage/localForage) for storage.
+
+# How to use CUD
+
+
 
 [build-badge]: https://img.shields.io/travis/user/repo/master.png?style=flat-square
 [build]: https://travis-ci.org/user/repo

@@ -1,7 +1,7 @@
 {
-  "name": "postcache",
-  "version": "1.4.0",
-  "description": "Describe postcache here",
+  "name": "CUD",
+  "version": "1.4.1",
+  "description": "Store the CUD requests for your Progressive Web App. When the user regains internet connection, fire them off.",
   "main": "lib/index.js",
   "module": "es/index.js",
   "files": [
@@ -24,8 +24,8 @@
   "devDependencies": {
     "nwb": "0.23.x"
   },
-  "author": "",
+  "author": "RobertPTC",
   "homepage": "",
   "license": "MIT",
-  "repository": ""
+  "repository": "https://github.com/RobertPTC/cud"
 }
