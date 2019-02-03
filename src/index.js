@@ -61,7 +61,7 @@ const setPollingInterval = (context) => {
   }
 };
 
-class Postcache {
+class CUD {
   constructor(opts) {
     this.initialized = false;
     setOpts(opts, this);
@@ -159,6 +159,6 @@ class Postcache {
   }
 };
 
-const postcacheSingleton = new Postcache(DEFAULT_OPTS);
+const CUDsingleton = new CUD(DEFAULT_OPTS);
 
-export default postcacheSingleton;
+export default CUDsingleton;
