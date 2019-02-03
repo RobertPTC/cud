@@ -1,12 +1,8 @@
-# CUD
+# cudcache
 
-[![Travis][build-badge]][build]
-[![npm package][npm-badge]][npm]
-[![Coveralls][coveralls-badge]][coveralls]
+cudcache is a quick and simple JavaScript library for caching POST, PUT, and DELETE requests made when your app is offline. cudcache makes it easier to provide a comprehensive PWA experience for your users. cudcache relies on [localforage](https://github.com/localForage/localForage) for storage.
 
-CUD is a quick and simple JavaScript library for caching POST, PUT, and DELETE requests made when your app is offline. CUD makes it easier to provide a comprehensive PWA experience for your users. CUD relies on [localforage](https://github.com/localForage/localForage) for storage.
-
-# How to use CUD
+# How to use cudcache
 
 CUD provides a set of methods that wrap your post, delete, and put requests. Before sending the request, CUD tests the quality of the user's internet connection. If that test fails, CUD stores the request and associated data and sets an interval to re-check whether the user has regained connection. If so, all requests are processed atomically, i.e. if one fails they all fail. After successfully completing CUD clears the cache and the interval.
 
@@ -24,9 +20,9 @@ const requestObj = {
 }
 ```
 
-Not too painful! Then, just call CUD.post(requestObj), CUD.put(requestObj), or CUD.del(requestObj). CUD will take care of the rest.
+Not too painful! Then, just call cudcache.post(requestObj), cudcache.put(requestObj), or cudcache.del(requestObj). cudcache will take care of the rest.
 
-You can call CUD.init(options) with an options object as well. Options available at the moment for configuring your instance of CUD:
+You can call cudcache.init(options) with an options object as well. Options available at the moment for configuring your instance of cudcache:
 
 Property name | Property type | Notes
 ------------- |  ------------- |  -----
@@ -42,7 +38,7 @@ batchCachedRequests | Boolean | Flag to designate whether cached requests should
 [build]: https://travis-ci.org/user/repo -->
 
 [npm-badge]: https://img.shields.io/npm/v/npm-package.png?style=flat-square
-[npm]: https://www.npmjs.org/package/cud
+[npm]: https://www.npmjs.org/package/cudcache
 
 <!-- [coveralls-badge]: https://img.shields.io/coveralls/user/repo/master.png?style=flat-square
 [coveralls]: https://coveralls.io/github/user/repo -->
