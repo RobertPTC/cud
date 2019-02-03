@@ -29,7 +29,7 @@ Not too painful! Then, just call CUD.post(requestObj), CUD.put(requestObj), or C
 You can call CUD.init(options) with an options object as well. Options available at the moment for configuring your instance of CUD:
 
 Property name | Property type | Notes
--------------   -------------   -----
+------------- |  ------------- |  -----
 
 networkTimeout | Integer | A number in milliseconds that will set the threshold to wait for network response before caching request. Defaults to 4000.
 testConnectionURL | String | URL to test for network connectivity. Defaults to 'https://api.coinranking.com/v1/public/coins'.
