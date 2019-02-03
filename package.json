@@ -27,5 +27,6 @@
   "author": "RobertPTC",
   "homepage": "",
   "license": "MIT",
-  "repository": "https://github.com/RobertPTC/cud"
+  "repository": "https://github.com/RobertPTC/cud",
+  "keywords": "progressive web app, pwa, requests, cache, offline"
 }
