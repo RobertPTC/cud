@@ -1,7 +1,7 @@
 {
-  "name": "cud",
+  "name": "cudcache",
   "version": "1.4.1",
-  "description": "Store CUD requests for your Progressive Web App. When the user regains internet connection, fire them off.",
+  "description": "Store CUD requests for your Progressive Web App. When the user regains internet connection, fire them off with cudcache.",
   "main": "lib/index.js",
   "module": "es/index.js",
   "files": [
