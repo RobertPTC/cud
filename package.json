@@ -1,6 +1,6 @@
 {
   "name": "cudcache",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Store CUD requests for your Progressive Web App. When the user regains internet connection, fire them off with cudcache.",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -27,6 +27,6 @@
   "author": "RobertPTC",
   "homepage": "",
   "license": "MIT",
-  "repository": "https://github.com/RobertPTC/cud",
+  "repository": "https://github.com/RobertPTC/cudcache",
   "keywords": "progressive web app, pwa, requests, cache, offline"
 }
