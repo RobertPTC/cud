@@ -30,7 +30,6 @@ You can call CUD.init(options) with an options object as well. Options available
 
 Property name | Property type | Notes
 ------------- |  ------------- |  -----
-
 networkTimeout | Integer | A number in milliseconds that will set the threshold to wait for network response before caching request. Defaults to 4000.
 testConnectionURL | String | URL to test for network connectivity. Defaults to 'https://api.coinranking.com/v1/public/coins'.
 unloadRequestsFailure | Function | Callback that executes if CUD tried to unload cached requests but failed.
